@@ -1,7 +1,11 @@
 package org.zero2one.produtos.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.zero2one.produtos.model.Product;
+import org.zero2one.produtos.repository.ProductRepository;
 
 import java.util.*;
 
@@ -9,33 +13,36 @@ import java.util.*;
 @RequestMapping("/products")
 public class ProductsController {
 
-    private Map<String, Product> products = new HashMap<>();
+    @Autowired
+    private ProductRepository repository;
 
-    public ProductsController() {
-        Product celular = new Product();
-        celular.setId("1A");
-        celular.setDescription("Novo Moto X 2");
-        celular.setName("Moto X");
-        celular.setPrice(1999.99);
 
-        Product notebook = new Product();
-        celular.setId("1B");
-        celular.setDescription("Dell i9");
-        celular.setName("Dell");
-        celular.setPrice(9999.99);
-
-        products.put(celular.getId(), celular);
-        products.put(notebook.getId(), notebook);
-    }
 
     @GetMapping
-    public Collection<Product> get() {
-        return products.values();
+    public Collection<Product> get(@RequestParam(required = false, value = "description") String description) {
+        if (description != null) {
+            return repository.findAllByDescription(description);
+        }
+        return repository.findAll();
     }
 
     @GetMapping("/{id}")
-    public Product getById(@PathVariable("id") String id){
-        return products.get(id);
+    public ResponseEntity getById(@PathVariable("id") String id){
+        Product product = repository.findById(id).orElse(null);
+        if(product == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(product);
+    }
+
+    @PostMapping
+    public Product create(@RequestBody Product product) {
+        return repository.save(product);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete (@PathVariable("id") String id) {
+        repository.deleteById(id);
     }
 
 }
