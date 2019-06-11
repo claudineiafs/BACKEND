@@ -2,12 +2,12 @@ package org.zero2one.produtos.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import org.zero2one.produtos.model.Product;
+import org.zero2one.produtos.model.Task;
 
 import java.util.Collection;
 
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, String> {
-    Collection<Product> findAllByDescription(String description);
+public interface TaskRepository extends JpaRepository<Task, String> {
+    Collection<Task> findAllByDescription(String description);
 }
